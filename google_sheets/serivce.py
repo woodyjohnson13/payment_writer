@@ -17,16 +17,20 @@ class GoogleSheet:
         client = gspread.authorize(scoped_credentials)
         sheet = client.open_by_key(spreadsheet_id).worksheet(sheet_name)
         return sheet
-            
+    
+    
+    def convert_to_column_number(self,col_literal):
+        column_number = 0
+        for char in col_literal.upper():
+            digit = ord(char) - ord('A') + 1
+            column_number = column_number * 26 + digit
+        return column_number
+        
         
     def add_row(self, sheet, data):
-        column_mapping = {'M': 13, 'AJ': 36, 'AL': 38,'AK':37,'Z': 26}  # Extend for more columns
-
         last_row = len(sheet.get_all_values())
-
         for column, value in data.items():
-            column_index = column_mapping.get(column.upper(), None)  # Handle non-existent columns gracefully
-
+            column_index=self.convert_to_column_number(column)
             if column_index:
                 sheet.update_cell(last_row + 1, column_index, value)
             else:
